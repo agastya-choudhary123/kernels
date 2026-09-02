@@ -1,0 +1,37 @@
+device                : Apple M4
+shape                 : M=16384 K=16384 group=64  (128.00 MB weights)
+unified memory        : GPU and CPU both read buffer.contents, no copies
+cpu path              : amx, 10 threads (4P + 6E)
+bytes per full GEMV   : 144.10 MB
+GEMVs per timed batch : 12 (amortises command-buffer submission)
+cache-defeat rotation : 2 copies (288 MB distinct)
+
+amx scratch           : 60 blocks x 16 rows x 16384 = 60 MB (sized to stay in L2)
+
+computing fp64 reference (16384 x 16384)...
+  split  0.00 (gpu rows      0, cpu rows  16384)  err/|ref|inf 1.99e-07  ok
+  split  0.50 (gpu rows   8192, cpu rows   8192)  err/|ref|inf 2.09e-04  ok
+  split  0.85 (gpu rows  13926, cpu rows   2458)  err/|ref|inf 2.11e-04  ok
+  split  1.00 (gpu rows  16384, cpu rows      0)  err/|ref|inf 2.11e-04  ok
+
+gpu frac gpu rows cpu rows          ms        GB/s    % peak
+---------------------------------------------------------------------
+   0.000        0    16384       8.574       17.62      14.7
+   0.100     1638    14746       7.846       19.26      16.0
+   0.200     3277    13107       7.134       21.18      17.7
+   0.300     4915    11469       6.497       23.26      19.4
+   0.400     6554     9830       5.856       25.80      21.5
+   0.500     8192     8192       5.142       29.39      24.5
+   0.600     9830     6554       4.666       32.38      27.0
+   0.700    11469     4915       4.149       36.42      30.3
+   0.800    13107     3277       3.723       40.58      33.8
+   0.900    14746     1638       3.213       47.03      39.2
+   1.000    16384        0       1.362      110.96      92.5
+---------------------------------------------------------------------
+
+GPU only              :    1.362 ms   110.96 GB/s
+CPU only (amx )       :    8.574 ms    17.62 GB/s
+best combined         :    1.362 ms   110.96 GB/s   at gpu fraction 1.000
+speedup vs GPU only   : 1.0000x
+split predicted from measured throughput: 0.863   (measured optimum 1.000)
+ideal if perfectly additive: 1.1588x  (1/(1/t_gpu + 1/t_cpu) = 1.175 ms)

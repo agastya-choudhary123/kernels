@@ -1,0 +1,13 @@
+*.o
+*.dSYM/
+
+# compiled benchmark binaries
+hetero-gemv/hetero
+int4-gemv/int4gemv
+moe-fused/moefused
+moe-pipeline/moepipe
+vq-gemv/vqgemv
+
+__pycache__/
+*.pyc
+.DS_Store

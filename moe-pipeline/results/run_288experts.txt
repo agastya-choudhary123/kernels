@@ -1,0 +1,27 @@
+device                : Apple M4
+store                 : /Users/agastya/Desktop/moe-stream/model-120b/experts.bin
+expert blob           : 13.38 MB   (gate/up/down, int4 g=64, bf16 scales)
+token                 : 36 layers x top-4 = 144 expert fetches = 2.02 GB
+page cache            : bypassed (F_NOCACHE), read-ahead off, no expert fetched twice
+run                   : 288 experts (4.04 GB) x 3 reps
+
+GPU compute / expert  :   0.168 ms   (83.3 GB/s over the blob)
+
+driver                            wall          GB/s         tok/s    SSD busy exposed IO
+--------------------------------------------------------------------------------------------
+  seq  stop-and-wait            1.56 s    2.59 GB/s    1.28 tok/s   busy  82%  exposed IO  1.28 s (100%)
+  io   reads only (ceiling)     1.16 s    3.47 GB/s    1.72 tok/s   busy 100%  exposed IO  0.00 s (  0%)
+  pipe stream+compute           1.17 s    3.46 GB/s    1.71 tok/s   busy 100%  exposed IO  0.83 s ( 71%)
+--------------------------------------------------------------------------------------------
+
+pipelined vs stop-and-wait : 1.335x   (1.28 -> 1.71 tok/s)
+pipelined vs reads-only    : 99.7% of the pure-IO rate (the pipeline's real ceiling)
+SSD busy fraction          : 82% -> 100%   (idle device is what stop-and-wait actually costs)
+
+where the win is NOT:
+  IO per expert 4.040 ms vs compute 0.168 ms -- 24x more IO than compute.
+  Overlapping compute with IO can therefore save at most 4.0% of
+  stop-and-wait wall time, and it does: 92% of GPU time is hidden,
+  worth 3.1% of the 33.5% total gain.
+where the win IS:
+  keeping a read in flight at all times -- the device never drains.

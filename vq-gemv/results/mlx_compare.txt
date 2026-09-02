@@ -1,0 +1,4 @@
+MLX affine int4 at the same 0.5625 bytes/param:
+  mlx.quantized_matmul  M=8192 K=8192 g=64  [6 copies, 45/span]    0.363 ms   104.24 GB/s  86.9% of peak
+  mlx.quantized_matmul  M=16384 K=16384 g=64  [2 copies, 17/span]    1.430 ms   105.69 GB/s  88.1% of peak
+  mlx.quantized_matmul  M=32768 K=16384 g=64  [1 copies, 10/span]    2.905 ms   104.02 GB/s  86.7% of peak

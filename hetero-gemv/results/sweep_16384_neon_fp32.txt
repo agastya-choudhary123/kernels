@@ -1,0 +1,35 @@
+device                : Apple M4
+shape                 : M=16384 K=16384 group=64  (128.00 MB weights)
+unified memory        : GPU and CPU both read buffer.contents, no copies
+cpu path              : neon, 10 threads (4P + 6E)
+bytes per full GEMV   : 144.10 MB
+GEMVs per timed batch : 12 (amortises command-buffer submission)
+cache-defeat rotation : 2 copies (288 MB distinct)
+
+computing fp64 reference (16384 x 16384)...
+  split  0.00 (gpu rows      0, cpu rows  16384)  err/|ref|inf 7.94e-07  ok
+  split  0.50 (gpu rows   8192, cpu rows   8192)  err/|ref|inf 2.09e-04  ok
+  split  0.85 (gpu rows  13926, cpu rows   2458)  err/|ref|inf 2.11e-04  ok
+  split  1.00 (gpu rows  16384, cpu rows      0)  err/|ref|inf 2.11e-04  ok
+
+gpu frac gpu rows cpu rows          ms        GB/s    % peak
+---------------------------------------------------------------------
+   0.000        0    16384       3.503       43.13      35.9
+   0.100     1638    14746       3.173       47.62      39.7
+   0.200     3277    13107       2.828       53.42      44.5
+   0.300     4915    11469       2.478       60.98      50.8
+   0.400     6554     9830       2.133       70.83      59.0
+   0.500     8192     8192       1.803       83.81      69.8
+   0.600     9830     6554       1.460      103.46      86.2
+   0.700    11469     4915       1.341      112.64      93.9
+   0.800    13107     3277       1.369      110.37      92.0
+   0.900    14746     1638       1.399      108.04      90.0
+   1.000    16384        0       1.447      104.38      87.0
+---------------------------------------------------------------------
+
+GPU only              :    1.447 ms   104.38 GB/s
+CPU only (neon)       :    3.503 ms    43.13 GB/s
+best combined         :    1.341 ms   112.64 GB/s   at gpu fraction 0.700
+speedup vs GPU only   : 1.0791x
+split predicted from measured throughput: 0.708   (measured optimum 0.700)
+ideal if perfectly additive: 1.4132x  (1/(1/t_gpu + 1/t_cpu) = 1.024 ms)

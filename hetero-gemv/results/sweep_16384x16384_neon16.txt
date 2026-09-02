@@ -1,0 +1,45 @@
+device                : Apple M4
+shape                 : M=16384 K=16384 group=64  (128.00 MB weights)
+unified memory        : GPU and CPU both read buffer.contents, no copies
+cpu path              : neon16, 10 threads (4P + 6E)
+bytes per full GEMV   : 144.10 MB
+GEMVs per timed batch : 12 (amortises command-buffer submission)
+cache-defeat rotation : 2 copies (288 MB distinct)
+
+computing fp64 reference (16384 x 16384)...
+  split  0.00 (gpu rows      0, cpu rows  16384)  err/|ref|inf 1.96e-04  ok
+  split  0.50 (gpu rows   8192, cpu rows   8192)  err/|ref|inf 2.09e-04  ok
+  split  0.85 (gpu rows  13926, cpu rows   2458)  err/|ref|inf 2.11e-04  ok
+  split  1.00 (gpu rows  16384, cpu rows      0)  err/|ref|inf 2.11e-04  ok
+
+gpu frac gpu rows cpu rows          ms        GB/s    % peak
+---------------------------------------------------------------------
+   0.000        0    16384       2.577       58.62      48.9
+   0.050      819    15565       2.453       61.60      51.3
+   0.100     1638    14746       2.321       65.10      54.2
+   0.150     2458    13926       2.217       68.16      56.8
+   0.200     3277    13107       2.101       71.92      59.9
+   0.250     4096    12288       1.962       77.01      64.2
+   0.300     4915    11469       1.860       81.23      67.7
+   0.350     5734    10650       1.751       86.30      71.9
+   0.400     6554     9830       1.629       92.73      77.3
+   0.450     7373     9011       1.518       99.51      82.9
+   0.500     8192     8192       1.387      108.96      90.8
+   0.550     9011     7373       1.287      117.39      97.8
+   0.600     9830     6554       1.313      115.04      95.9
+   0.650    10650     5734       1.322      114.32      95.3
+   0.700    11469     4915       1.321      114.41      95.3
+   0.750    12288     4096       1.320      114.45      95.4
+   0.800    13107     3277       1.334      113.23      94.4
+   0.850    13926     2458       1.339      112.85      94.0
+   0.900    14746     1638       1.344      112.45      93.7
+   0.950    15565      819       1.343      112.50      93.7
+   1.000    16384        0       1.379      109.54      91.3
+---------------------------------------------------------------------
+
+GPU only              :    1.379 ms   109.54 GB/s
+CPU only (neon16)       :    2.577 ms    58.62 GB/s
+best combined         :    1.287 ms   117.39 GB/s   at gpu fraction 0.550
+speedup vs GPU only   : 1.0717x
+split predicted from measured throughput: 0.651   (measured optimum 0.550)
+ideal if perfectly additive: 1.5352x  (1/(1/t_gpu + 1/t_cpu) = 0.899 ms)

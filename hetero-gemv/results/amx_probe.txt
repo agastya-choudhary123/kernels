@@ -1,0 +1,2 @@
+sgemv  0.176 ms    47.7 GFLOP/s
+sgemm  0.666 ms   806.1 GFLOP/s  (n=64)

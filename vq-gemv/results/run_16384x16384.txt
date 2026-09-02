@@ -1,0 +1,34 @@
+device                : Apple M4
+shape                 : M=16384 K=16384
+VQ   d=2 K=256         : 0.5625 bytes/param  (128.00 MB idx + 16.00 MB scale)
+int4 affine g=64      : 0.5625 bytes/param  (128.00 MB w  + 16.00 MB scale/bias)
+threadgroup size      : 256 threads (8 simdgroups)
+max threadgroup mem   : 32768 bytes (replicated codebook needs 32768)
+cache-defeat rotation : 2 copies (288 MB distinct)
+
+settling GPU clocks   : plateaued at 112.7 GB/s after 20 rounds
+
+computing CPU references (16384 rows x 16384, both formats)...
+dispatches per buffer : 4
+all variants verified against their CPU reference
+
+variant                                 GB/s GB/s(med)   gpu ms  % peak  % ceil       err
+---------------------------------------------------------------------------------------
+  VQ v0 scalar (1 thread/row)          88.79     87.02    1.702    74.0    79.9   9.0e-07
+  VQ v1 shared codebook (1 KB)        107.88    107.09    1.401    89.9    97.0   3.1e-04
+  VQ v3 codebook in device mem        107.88    106.89    1.401    89.9    97.0   3.1e-04
+  VQ v2 persistent,  1 codebook copies    106.85    105.82    1.414    89.0    96.1   3.1e-04
+  VQ v2 persistent,  4 codebook copies    106.24    105.85    1.422    88.5    95.5   3.1e-04
+  VQ v2 persistent,  8 codebook copies    101.46    101.17    1.489    84.6    91.3   3.1e-04
+  VQ v2 persistent, 32 codebook copies     85.49     85.39    1.767    71.2    76.9   3.1e-04
+  VQ v5 wide + unroll 2               110.74    110.25    1.364    92.3    99.6   3.1e-04
+  VQ v5 wide + unroll 4               111.95    110.95    1.350    93.3   100.7   3.1e-04
+  int4 wide+unroll (same bytes)       112.22    111.58    1.346    93.5   100.9   2.7e-04
+  int4 affine (same bytes/param)      107.12    106.18    1.411    89.3    96.3   2.7e-04
+  [ceiling] pure streaming read       111.19    110.47    1.207    92.7   100.0   0.0e+00
+---------------------------------------------------------------------------------------
+
+best VQ kernel        : VQ v5 wide + unroll 4
+  111.95 GB/s  (93.3% of peak, 100.7% of ceiling)  1.350 ms
+int4 at equal bytes   : 112.22 GB/s  (93.5% of peak)  1.346 ms
+VQ / int4 throughput  : 0.998x   (both 0.5625 bytes/param)

@@ -1,0 +1,18 @@
+[transformers] Token indices sequence length is longer than the specified maximum sequence length for this model (299078 > 131072). Running this sequence through the model will result in indexing errors
+model Qwen/Qwen2.5-0.5B-Instruct
+wikitext-2 test: 1294336 chars -> 299078 tokens, 146 windows of 2048
+
+quantising 168 tensors, 357.8M of 494.0M params
+
+  fp16 (unquantised)       bits/w 16.000   ppl  14.2499   [96s, 299008 tokens]
+  affine int4 g=64         bits/w  4.500   ppl  16.2559   [quant 0s, eval 101s]
+  codebook VQ d=2 K=256    bits/w  4.504   ppl  15.4926   [quant 74s, eval 103s]
+
+  scheme                    bits/w       ppl  d vs fp16
+  fp16 (unquantised)        16.000   14.2499    +0.0000
+  affine int4 g=64           4.500   16.2559    +2.0060
+  codebook VQ d=2 K=256      4.504   15.4926    +1.2427
+
+  at equal 4.504 bits/weight: VQ ppl 15.4926 vs int4 16.2559 (-0.7633, -4.70%)
+
+[exited with code 0]

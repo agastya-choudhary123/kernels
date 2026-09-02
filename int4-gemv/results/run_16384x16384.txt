@@ -1,0 +1,42 @@
+device                : Apple M4
+shape                 : M=16384 K=16384  group=64  (4-bit, fp16 scale+bias)
+weight bytes          : 128.00 MB  (0.5625 bytes/param incl. metadata)
+threadgroup size      : 256 threads (8 simdgroups)
+cache-defeat rotation : 2 identical weight copies (320 MB distinct)
+compiled via          : MTLDevice newLibraryWithSource (no Xcode toolchain)
+
+settling GPU clocks   : plateaued at 111.7 GB/s after 20 rounds
+stream_read tuning    :  112.26 GB/s  (93.5% of 120 GB/s peak)  pure read of the same 128.0 MB  [unroll=1, 4194304 threads]
+
+computing CPU reference (16384 rows x 16384)...
+dispatches per buffer : 12  (timed span ~5.0 ms)
+all 14 variants verified against the CPU reference (max err/|ref|inf 2.1e-04)
+
+variant                                   GB/s GB/s(med)   gpu ms  wall ms  % peak  % ceil
+--------------------------------------------------------------------------------------
+  v0 scalar (1 thread/row)               78.48     78.09    1.925    1.950    65.4    69.3
+  v1 simdgroup/row, uint4 loads         106.59    105.30    1.418    1.442    88.8    94.1
+  v2 multirow R=2                       105.52    103.76    1.432    1.458    87.9    93.1
+  v2 multirow R=4                       104.52    104.00    1.446    1.471    87.1    92.2
+  v2 multirow R=8                       101.84    101.30    1.484    1.507    84.9    89.9
+  v3 multirow R=2 + x in tgmem           96.27     94.17    1.569    1.594    80.2    85.0
+  v3 multirow R=4 + x in tgmem          102.77    101.52    1.470    1.496    85.6    90.7
+  v5 wide x loads + xs in tgmem         107.53    106.26    1.405    1.436    89.6    94.9
+  v6 wide + unroll 2                    110.69    109.88    1.365    1.390    92.2    97.7
+  v6 wide + unroll 4                    112.46    111.35    1.344    1.370    93.7    99.3
+  v6 wide + unroll 8                    109.78    108.45    1.376    1.399    91.5    96.9
+  v4 fused scale+bias R=1               106.84    105.85    1.414    1.438    89.0    94.3
+  v4 fused scale+bias R=2               105.41    104.56    1.433    1.460    87.8    93.0
+  v4 fused scale+bias R=4               104.85    102.93    1.441    1.466    87.4    92.5
+  [ceiling] pure streaming read         113.31    111.45    1.185    1.207    94.4   100.0
+-------------------------------------------------------------------------
+
+bytes moved per GEMV  : 144.10 MB
+pure-read ceiling     : 113.31 GB/s (94.4% of peak)
+best GEMV variant     : v6 wide + unroll 4
+achieved bandwidth    : 112.46 GB/s   (1.344 ms gpu, 1.370 ms wall)
+  wall-clock bandwidth: 110.29 GB/s  (command-buffer submission included,
+                        amortised over 12 dispatches -- this is the number
+                        bench/compare_mlx.py is directly comparable to)
+  % of 120 GB/s peak  : 93.7%
+  % of stream ceiling : 99.3%

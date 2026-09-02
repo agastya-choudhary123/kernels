@@ -1,0 +1,22 @@
+loading 128 experts (1.80 GB) ... 0.2 s
+device                : Apple M4
+block                 : hidden=2880 inter=2880  128 experts, top-4  (gpt-oss-120b, int4 g=64)
+resident experts      : 1.80 GB
+weights read / block  : 55.99 MB  (top-4 x gate+up+down, decimal MB)
+
+correctness vs fp64 CPU reference (router, top-k, both matmuls, SwiGLU)
+  fused (3 kernels)      top-k match   max|d|/|y|inf = 2.15e-05  ok
+  fused, atomic sum(h)   top-k match   max|d|/|y|inf = 4.60e-05  ok
+  unfused (27 kernels)   top-k match   max|d|/|y|inf = 2.15e-05  ok
+
+path                       launches     ms/block         GB/s        tok/s
+------------------------------------------------------------------------
+  unfused                        28       0.6846        81.78         40.6
+  fused                           3       0.6736        83.12         41.2
+  fused, atomic sum(h)            3       0.6733        83.15         41.3
+------------------------------------------------------------------------
+
+launches per block    : 28 -> 3  (9.3x fewer)
+launches per token    : 1008 -> 108  (36 layers)
+block time            : 0.6846 -> 0.6733 ms  (1.017x)
+decode rate           : 40.6 -> 41.3 tok/s  (experts resident, MoE only)

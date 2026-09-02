@@ -1,0 +1,4 @@
+ran gemv_vq_shared on real weights: M=896 K=4864 -> /Users/agastya/Desktop/kernels/vq-gemv/results/real/y_metal.f32
+model.layers.12.mlp.down_proj.weight  M=896 K=4864
+  metal kernel vs MLX dequant-matmul: max|d|/|ref|inf = 1.99e-04  ok
+  relative RMS reconstruction error on this tensor: VQ 0.08301   int4 0.09716

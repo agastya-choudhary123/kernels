@@ -1,0 +1,8 @@
+# MLX MoE block, same weights, same router/x, fp16 activations both sides
+gather  MLX MoE block [gather]: 6.9008 ms  8.11 GB/s  4.0 tok/s (36 layers)
+take    MLX MoE block [take]: 2.2561 ms  24.82 GB/s  12.3 tok/s (36 layers)
+
+# gather_qmm cost vs TOTAL expert count (one projection, 4 experts gathered)
+  experts=8   0.6915 ms
+  experts=32  1.0515 ms
+  experts=128 2.5272 ms

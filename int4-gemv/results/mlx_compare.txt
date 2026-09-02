@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/agastya/Desktop/kernels/int4-gemv/bench/compare_mlx.py", line 114, in <module>
+    ok = correctness()
+         ^^^^^^^^^^^^^
+  File "/Users/agastya/Desktop/kernels/int4-gemv/bench/compare_mlx.py", line 33, in correctness
+    M, K, G = map(int, open(os.path.join(RES, "shape.txt")).read().split())
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/agastya/Desktop/kernels/int4-gemv/results/shape.txt'

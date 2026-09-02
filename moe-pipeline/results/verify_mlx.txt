@@ -1,0 +1,4 @@
+  gate   vs MLX: max|d|/|ref|inf = 2.32e-07  ok
+  up     vs MLX: max|d|/|ref|inf = 3.31e-07  ok
+  h      vs MLX: max|d|/|ref|inf = 6.13e-07  ok
+  y      vs MLX: max|d|/|ref|inf = 1.53e-07  ok
